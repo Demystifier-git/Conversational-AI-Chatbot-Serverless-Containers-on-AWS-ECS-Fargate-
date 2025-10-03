@@ -1,92 +1,59 @@
-🚀 Chatbot AI Deployment on AWS
+Chatbot AI Deployment on AWS
 
 This project demonstrates how to deploy a production-ready Chatbot AI application on AWS using ECS Fargate, RDS MySQL, and a complete CI/CD pipeline. The deployment is secured with IAM roles, Route53, ACM, and a Load Balancer, with automated scans, monitoring, and scaling.
 
-🏗 Architecture Overview 🔹 Source Control & CI/CD
-
+ Architecture Overview 🔹 Source Control & CI/CD
 GitHub → source code hosting
-
 GitHub Actions → CI/CD pipeline
-
 SonarCloud → static code analysis
-
 Docker → containerization
-
 Trivy → image vulnerability scanning
-
 Amazon ECR → final image registry
 
-🔹 Application Infrastructure
-
+Application Infrastructure
 VPC → with both public and private subnets
-
 ECS Fargate → cluster in private subnets
-
-RDS MySQL → database in private subnet
-
+RDS MySQL → database in private subne
 NAT Gateway → ECS tasks access internet securely
 
 IAM Roles → secure ECS ↔ RDS communication
-
-🔹 Networking & Security
-
+ Networking & Security
 Route53 → hosted zone for domain name
-
 ACM → SSL/TLS certificate management
-
 Application Load Balancer (ALB) → TLS termination in public subnets
-
 Domain Name → points to ALB for browser access
 
-🔹 Scaling & Monitoring
-
+ Scaling & Monitoring
 ECS Service Auto Scaling → exponential scaling via CloudWatch metrics
-
 RDS Scaling → Python + Lambda function for DB scaling automation
-
 CloudWatch → metrics, logs, dashboards
-
 SNS → notifications (alerts via email/SMS)
-
 Load Testing → validate scaling under stress
 
-⚙️ Setup Instructions 1️⃣ Prerequisites
-
+ Setup Instructions 1️⃣ Prerequisites
 AWS Account (IAM admin access)
-
 Domain managed in Route53
 
 Local tools installed:
-
 Docker
-
 AWS CLI
-
-Terraform or CloudFormation
-
+Terraform 
 SonarCloud Account
-
 Trivy
 
-2️⃣ CI/CD Pipeline
-
+ CI/CD Pipeline
 Push code to GitHub.
-
 GitHub Actions workflow:
 
-✅ Run Tests
+ Run Tests
+ SonarCloud Scan
+ Build Docker Image
 
-✅ SonarCloud Scan
+Run Trivy Scan
+ Push to Amazon ECR
 
-✅ Build Docker Image
-
-✅ Run Trivy Scan
-
-✅ Push to Amazon ECR
-
-✅ Deploy to ECS Fargate
-
-3️⃣ Infrastructure Setup (Terraform)
+Deploy to ECS Fargate
+Infrastructure Setup (Terraform)
 
 This project uses Terraform to provision all AWS resources. The repo is organized into modules for clarity and reusability:
 
