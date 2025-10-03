@@ -1,0 +1,8 @@
+{
+    "name": "myorg/frontend",
+    "description": "Frontend PHP app",
+    "require": {
+      "php": "^8.1"
+    }
+  }
+  

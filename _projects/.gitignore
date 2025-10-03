@@ -1,0 +1,13 @@
+mysql/
+php/
+
+
+# Local Terraform state
+*.tfstate
+*.tfstate.*
+terraform.tfstate.backup
+
+
+# Terraform working directory
+.terraform/
+.terraform.lock.hcl

@@ -1,0 +1,54 @@
+[
+  {
+    "name": "Chatbot-AI",
+    "image": "public.ecr.aws/a0l9x4c2/project:chatbotai-0c2ab8b",
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 80,
+        "hostPort": 80,
+        "protocol": "tcp"
+      }
+    ],
+    "environment": [
+      {
+        "name": "DB_HOST",
+        "value": "my-mysql-db.c69ouswgucms.us-east-1.rds.amazonaws.com"
+      },
+      {
+        "name": "DB_PORT",
+        "value": "3306"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "DB_USER",
+        "valueFrom": "arn:aws:secretsmanager:us-east-1:920216467853:secret:Chatbot-secret-1MeQPi:DB_USER::"
+      },
+      {
+        "name": "DB_PASS",
+        "valueFrom": "arn:aws:secretsmanager:us-east-1:920216467853:secret:Chatbot-secret-1MeQPi:DB_PASS::"
+      },
+      {
+        "name": "DB_NAME",
+        "valueFrom": "arn:aws:secretsmanager:us-east-1:920216467853:secret:Chatbot-secret-1MeQPi:DB_NAME::"
+      },
+      {
+        "name": "API_KEY",
+        "valueFrom": "arn:aws:secretsmanager:us-east-1:920216467853:secret:Chatbot-secret-1MeQPi:API_KEY::"
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/ecs/chatbotAI",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "ecs"
+      }
+    }
+  }
+]
+
+  
+  
+  

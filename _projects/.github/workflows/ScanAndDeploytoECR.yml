@@ -1,0 +1,71 @@
+name: Build, Scan and Push Frontend (Public ECR)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR (Public)
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Build Frontend with latest base
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          FRONTEND_URI=public.ecr.aws/a0l9x4c2/project:chatbotai-$IMAGE_TAG
+          
+          docker build \
+            --pull --no-cache \
+            -t $FRONTEND_URI \
+            -f ./frontend/Dockerfile \
+            ./frontend
+          
+          echo "FRONTEND_URI=$FRONTEND_URI" >> $GITHUB_ENV
+
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+          sudo mv ./bin/trivy /usr/local/bin/trivy
+
+      - name: Scan Frontend (Vulnerabilities + Secrets)
+        run: |
+          # Fail if HIGH/CRITICAL vulns exist
+          trivy image --exit-code 1 --severity CRITICAL --format json -o chatbotai-vuln-report.json $FRONTEND_URI
+          # Fail if secrets detected
+          trivy image --security-checks secret --exit-code 1 --format json -o chatbotai-secret-report.json $FRONTEND_URI
+
+          # Always generate human-readable reports (non-blocking)
+          trivy image --exit-code 0 --severity HIGH,CRITICAL --format table -o chatbotai-vuln-report.txt $FRONTEND_URI
+          trivy image --security-checks secret --exit-code 0 --format table -o chatbotai-secret-report.txt $FRONTEND_URI
+
+      - name: Upload Scan Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: chatbotai-scan-reports
+          path: |
+            chatbotai-vuln-report.json
+            chatbotai-secret-report.json
+            chatbotai-vuln-report.txt
+            chatbotai-secret-report.txt
+
+      - name: Push Frontend
+        if: success()
+        run: docker push $FRONTEND_URI
+
+
